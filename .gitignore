@@ -4,7 +4,7 @@
 .idea
 db.sqlite3
 .DS_Store
-/*/migrations/00*.py
+#/*/migrations/00*.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
