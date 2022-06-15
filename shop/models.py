@@ -1,4 +1,57 @@
 from django.db import models
+import datetime
+from django.urls import reverse_lazy
+# from django.utils.translation import gettext as _
+
+today = datetime.date.today()
+
+
+class PicturesMedicine(models.Model):
+    image = models.ImageField(upload_to=f'medicine_pictures/{today.year}-{today.month}-{today.month}/',
+                              null=True, blank=True)
+
+
+class TypeProduct(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to=f'types/', null=True, blank=True)
+    icon = models.ImageField(upload_to=f'types/icons/', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Product(models.Model):
+    image = models.ImageField(upload_to=f'medicine/', null=True, blank=True)
+    pictures = models.ManyToManyField(PicturesMedicine, blank=True)
+    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    order_count = models.IntegerField(default=0)
+    description = models.TextField(null=True)
+    quantity = models.IntegerField(default=0)
+    review = models.IntegerField(default=0)
+    weight = models.FloatField(default=0)
+    type_medicine = models.ForeignKey(TypeProduct, on_delete=models.RESTRICT, null=True)
+    cost = models.IntegerField(null=True)
+    discount = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class CartModel(models.Model):
+    TYPE = (
+        (1, 'active'),
+        (2, 'done'),
+    )
+    user = models.ForeignKey('account.UserModel', on_delete=models.SET_NULL, null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    amount = models.IntegerField(default=1)
+    status = models.SmallIntegerField(default=1, choices=TYPE)
+
+    @property
+    def get_total_price(self):
+        return self.product.cost * self.amount
 
 
 PAYMENT_TYPES = (
@@ -24,19 +77,9 @@ DELIVERY_STATUS = (
 )
 
 
-class CartModel(models.Model):
-    TYPE = (
-        (1, 'active'),
-        (2, 'done'),
-    )
-    user = models.ForeignKey('account.UserModel', on_delete=models.SET_NULL, null=True, blank=True)
-    product = models.ForeignKey('Product', on_delete=models.RESTRICT)
-    amount = models.IntegerField(default=1)
-    status = models.SmallIntegerField(default=1, choices=TYPE)
-
-    @property
-    def get_total_price(self):
-        return self.product.price * self.amount
+class DeliveryMan(models.Model):
+    full_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=10)
 
 
 class OrderModel(models.Model):
@@ -48,61 +91,16 @@ class OrderModel(models.Model):
     payment_type = models.PositiveSmallIntegerField(choices=PAYMENT_TYPES, default=2)
     payment_status = models.PositiveSmallIntegerField(choices=PAYMENT_STATUS, default=1)
     delivery_status = models.PositiveSmallIntegerField(choices=DELIVERY_STATUS, default=1)
+    delivery = models.ForeignKey(DeliveryMan, on_delete=models.RESTRICT, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to='category_images', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        pass
-
-    class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+    def get_payme_amount(self):
+        return self.price*100
 
 
-class Subcategory(models.Model):
-    subcategory = models.ForeignKey(Category, on_delete=models.CASCADE)
-    path = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to='category_images', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+class Advertising(models.Model):
+    image = models.ImageField(upload_to=f'medicine/advertising/', null=True, blank=True)
+    title = models.CharField(max_length=255)
+    text = models.TextField()
+    medicine = models.ForeignKey(Product, on_delete=models.RESTRICT, null=True, blank=True)
 
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        pass
-
-    class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
-
-
-class Product(models.Model):
-    product = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='product_images', null=True, blank=True)
-    price = models.IntegerField(null=True, blank=True)
-    sale = models.IntegerField(null=True, blank=True)
-    liked = models.BooleanField(default=False)
-    in_stock = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        pass
-
-    class Meta:
-        verbose_name = 'Product'
-        verbose_name_plural = 'Products'
