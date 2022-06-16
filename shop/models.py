@@ -12,6 +12,7 @@ class PicturesMedicine(models.Model):
 
 
 class TypeProduct(models.Model):
+    sub = models.ForeignKey('self', on_delete=models.RESTRICT, null=True, blank=True)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to=f'types/', null=True, blank=True)
     icon = models.ImageField(upload_to=f'types/icons/', null=True, blank=True)
@@ -23,10 +24,10 @@ class TypeProduct(models.Model):
 class Product(models.Model):
     image = models.ImageField(upload_to=f'medicine/', null=True, blank=True)
     pictures = models.ManyToManyField(PicturesMedicine, blank=True)
-    name = models.CharField(max_length=100)
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=224)
+    title = models.CharField(max_length=224)
     order_count = models.IntegerField(default=0)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     quantity = models.IntegerField(default=0)
     review = models.IntegerField(default=0)
     weight = models.FloatField(default=0)
@@ -34,6 +35,11 @@ class Product(models.Model):
     cost = models.IntegerField(null=True)
     discount = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now=True, null=True)
+    gpu = models.CharField(max_length=224,null=True, blank=True)
+    cpu = models.CharField(max_length=224,null=True, blank=True)
+    power = models.CharField(max_length=224,null=True, blank=True)
+    display = models.CharField(max_length=224,null=True, blank=True)
+    ram = models.CharField(max_length=224,null=True, blank=True)
 
     def __str__(self):
         return self.name
