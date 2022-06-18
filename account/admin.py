@@ -38,4 +38,6 @@ admin.site.register(UserModel, CustomUserAdmin)
 # admin.site.register(CountyModel, CountryAdmin)
 # admin.site.register(RegionModel, RegionAdmin)
 admin.site.register(DeliveryAddress)
+admin.site.register(RegionModel)
+admin.site.register(CountyModel)
 

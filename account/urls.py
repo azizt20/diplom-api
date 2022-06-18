@@ -6,7 +6,7 @@ urlpatterns = [
     path('send/sms/confirm/', ConfirmSmsView.as_view()),
     path('registration/', RegistrationView.as_view()),
     path('country/', CountryView.as_view()),
-    path('region/<int:pk>/', RegionView.as_view()),
+    path('region/', RegionView.as_view()),
     path('add/address/<int:pk>/', AddAddressView.as_view()),
     path('me/', UserView.as_view()),
     path('deliver/address/', DeliverAddressView.as_view()),

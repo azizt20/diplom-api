@@ -10,6 +10,7 @@ from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerial
 from .models import PicturesMedicine, TypeProduct, Product, CartModel, OrderModel, Advertising
 from paymeuz.models import Card
 
+
 class AdvertisingView(APIView):
     # permission_classes = (IsAuthenticated,)
 
@@ -32,9 +33,9 @@ class MedicinesView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        # medicine = Medicine.objects.all()
-        filter = ProductFilter(request.GET, queryset=Product.objects.all())
-        serializer = MedicineSerializer(filter, many=True)
+        products = Product.objects.all()
+        q = ProductFilter(request.GET, queryset=products).qs
+        serializer = MedicineSerializer(q, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
@@ -84,8 +85,7 @@ class CartView(APIView):
 
     def put(self, request):
         cart = CartModel.objects.get(id=request.data['id'], user=request.user)
-        del request.data['id']
-        serializer = CartSerializer(cart, data=request.data, context={'request': request})
+        serializer = CartSerializer(instance=cart, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return ResponseSuccess(data=serializer.data, request=request.method)
@@ -94,7 +94,7 @@ class CartView(APIView):
 
     def delete(self, request):
         try:
-            CartModel.objects.get(id=request.data['id'], user=request.user).delete()
+            CartModel.objects.get(id=request.GET['id'], user=request.user).delete()
             return ResponseSuccess(request=request.method)
         except:
             return ResponseFail(request=request.method)
@@ -170,4 +170,3 @@ class OrderView(APIView):
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
-

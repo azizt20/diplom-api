@@ -45,23 +45,16 @@ class RegionSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    address = RegionSerializer(read_only=True)
 
     class Meta:
         model = UserModel
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'avatar', 'address', 'language',
-                  'favorite_medicine', 'favorite_doctor', 'theme_mode']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'avatar']
         extra_kwargs = {
             'username': {'read_only': True},
-            'favorite_medicine': {'read_only': True},
-            'favorite_doctor': {'read_only': True},
-            'address': {'read_only': True},
             'first_name': {'required': False},
             'last_name': {'required': False},
             'email': {'required': False},
             'avatar': {'required': False},
-            'language': {'required': False},
-            'theme_mode': {'required': False},
         }
 
 
@@ -80,5 +73,6 @@ class DeliverAddressSerializer(serializers.ModelSerializer):
             'door_or_phone': {'required': False},
             'instructions': {'required': False},
         }
+
 
 

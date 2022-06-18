@@ -57,7 +57,8 @@ class UserView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        serializer = UserSerializer(request.user)
+        user = UserModel.objects.get(id=request.user.id)
+        serializer = UserSerializer(user)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def put(self, request):
@@ -72,8 +73,8 @@ class UserView(APIView):
 class RegionView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, pk):
-        reg = RegionModel.objects.filter(country_id=pk)
+    def get(self, request):
+        reg = RegionModel.objects.all()
         serializer = RegionSerializer(reg, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
@@ -118,7 +119,6 @@ class DeliverAddressView(APIView):
             da.user = request.user
             da.region = region
             da.save()
-            serializers = DeliverAddressSerializer(da)
             return ResponseSuccess(data=serializers.data, request=request.method)
         else:
             return ResponseFail(data=serializers.errors, request=request.method)
