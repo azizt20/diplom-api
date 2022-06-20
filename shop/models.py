@@ -6,12 +6,12 @@ from django.urls import reverse_lazy
 today = datetime.date.today()
 
 
-class PicturesMedicine(models.Model):
-    image = models.ImageField(upload_to=f'medicine_pictures/{today.year}-{today.month}-{today.month}/',
+class Pictures(models.Model):
+    image = models.ImageField(upload_to=f'pictures/{today.year}-{today.month}-{today.month}/',
                               null=True, blank=True)
 
 
-class TypeProduct(models.Model):
+class Category(models.Model):
     sub = models.ForeignKey('self', on_delete=models.RESTRICT, null=True, blank=True)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to=f'types/', null=True, blank=True)
@@ -22,8 +22,8 @@ class TypeProduct(models.Model):
 
 
 class Product(models.Model):
-    image = models.ImageField(upload_to=f'medicine/', null=True, blank=True)
-    pictures = models.ManyToManyField(PicturesMedicine, blank=True)
+    image = models.ImageField(upload_to=f'product/', null=True, blank=True)
+    pictures = models.ManyToManyField(Pictures, blank=True)
     name = models.CharField(max_length=224)
     title = models.CharField(max_length=224)
     order_count = models.IntegerField(default=0)
@@ -31,7 +31,7 @@ class Product(models.Model):
     quantity = models.IntegerField(default=0)
     review = models.IntegerField(default=0)
     weight = models.FloatField(default=0)
-    type_medicine = models.ForeignKey(TypeProduct, on_delete=models.RESTRICT, null=True)
+    category = models.ForeignKey(Category, on_delete=models.RESTRICT, null=True)
     cost = models.IntegerField(null=True)
     discount = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now=True, null=True)
@@ -105,7 +105,7 @@ class OrderModel(models.Model):
 
 
 class Advertising(models.Model):
-    image = models.ImageField(upload_to=f'medicine/advertising/', null=True, blank=True)
+    image = models.ImageField(upload_to=f'shop/advertising/', null=True, blank=True)
     title = models.CharField(max_length=255)
     text = models.TextField()
     medicine = models.ForeignKey(Product, on_delete=models.RESTRICT, null=True, blank=True)

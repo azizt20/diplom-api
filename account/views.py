@@ -1,10 +1,10 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
+from .models import UserModel, RegionModel, CityModel, DeliveryAddress
 from config.helpers import send_sms_code, validate_sms_code
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
-                          RegionSerializer, CountrySerializer, UserSerializer, DeliverAddressSerializer)
+                          RegionSerializer, CitySerializer, UserSerializer, DeliverAddressSerializer)
 
 
 class SendSmsView(APIView):
@@ -70,21 +70,21 @@ class UserView(APIView):
             return ResponseFail(data=serializer.errors, request=request.method)
 
 
+class CityView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        reg = CityModel.objects.all()
+        serializer = CitySerializer(reg, many=True)
+        return ResponseSuccess(data=serializer.data, request=request.method)
+
+
 class RegionView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        reg = RegionModel.objects.all()
-        serializer = RegionSerializer(reg, many=True)
-        return ResponseSuccess(data=serializer.data, request=request.method)
-
-
-class CountryView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        coun = CountyModel.objects.all()
-        serializer = CountrySerializer(coun, many=True)
+        coun = RegionModel.objects.all()
+        serializer = RegionSerializer(coun, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
@@ -93,11 +93,11 @@ class AddAddressView(APIView):
 
     def post(self, request, pk):
         try:
-            region = RegionModel.objects.get(id=pk)
+            city = CityModel.objects.get(id=pk)
         except:
             return ResponseFail(data='Bunday Viloyat mavjud emas', request=request.method)
         user = request.user
-        user.address = region
+        user.address = city
         user.save()
         return ResponseSuccess(request=request.method)
 
@@ -111,13 +111,13 @@ class DeliverAddressView(APIView):
         return ResponseSuccess(data=serializers.data, request=request.method)
 
     def post(self, request):
-        region = RegionModel.objects.get(id=request.data["region"])
+        city = CityModel.objects.get(id=request.data["city"])
         serializers = DeliverAddressSerializer(data=request.data)
-        del request.data["region"]
+        del request.data["city"]
         if serializers.is_valid():
             da = DeliveryAddress(**serializers.data)
             da.user = request.user
-            da.region = region
+            da.city = city
             da.save()
             return ResponseSuccess(data=serializers.data, request=request.method)
         else:

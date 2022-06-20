@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
+from .models import UserModel, RegionModel, CityModel, DeliveryAddress
 from config.validators import PhoneValidator
 
 
@@ -30,17 +30,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CountrySerializer(serializers.ModelSerializer):
+class RegionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CountyModel
+        model = RegionModel
         fields = '__all__'
 
 
-class RegionSerializer(serializers.ModelSerializer):
-    # country = CountrySerializer()
+class CitySerializer(serializers.ModelSerializer):
+    # country = RegionSerializer()
 
     class Meta:
-        model = RegionModel
+        model = CityModel
         fields = '__all__'
 
 

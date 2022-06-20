@@ -77,15 +77,15 @@ class SmsAttempt(models.Model):
     last_attempt_at = models.DateTimeField(db_index=True)
 
 
-class CountyModel(models.Model):
+class RegionModel(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 
-class RegionModel(models.Model):
-    country = models.ForeignKey(CountyModel, on_delete=models.RESTRICT)
+class CityModel(models.Model):
+    region = models.ForeignKey(RegionModel, on_delete=models.RESTRICT, null=True, blank=True)
     name = models.CharField(max_length=100)
     delivery_price = models.IntegerField(default=0, null=True)
 
@@ -96,10 +96,9 @@ class RegionModel(models.Model):
 class DeliveryAddress(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.RESTRICT)
     name = models.CharField(max_length=255, null=True, blank=True)
-    region = models.ForeignKey(RegionModel, on_delete=models.RESTRICT, null=True)
+    city = models.ForeignKey(CityModel, on_delete=models.RESTRICT, null=True)
     full_address = models.CharField(max_length=255, null=True, blank=True)
-    apartment_office = models.CharField(max_length=255, null=True, blank=True)
-    floor = models.CharField(max_length=255, null=True, blank=True)
+    postcode = models.CharField(max_length=255, null=True, blank=True)
     door_or_phone = models.CharField(max_length=255, null=True, blank=True)
     instructions = models.CharField(max_length=255, null=True, blank=True)
 

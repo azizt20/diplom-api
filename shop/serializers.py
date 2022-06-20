@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PicturesMedicine, TypeProduct, Product, CartModel, OrderModel, Advertising
+from .models import Pictures, Category, Product, CartModel, OrderModel, Advertising
 from account.serializers import DeliverAddressSerializer
 from account.models import DeliveryAddress
 
@@ -11,22 +11,22 @@ class AdvertisingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PicturesMedicineSerializer(serializers.ModelSerializer):
+class PicturesSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = PicturesMedicine
+        model = Pictures
         fields = '__all__'
 
 
-class TypeMedicineSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = TypeProduct
+        model = Category
         fields = '__all__'
 
 
-class MedicineSerializer(serializers.ModelSerializer):
-    pictures = PicturesMedicineSerializer(many=True)
+class ProductSerializer(serializers.ModelSerializer):
+    pictures = PicturesSerializer(many=True)
 
     class Meta:
         model = Product
@@ -34,7 +34,7 @@ class MedicineSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    product = MedicineSerializer(read_only=True)
+    product = ProductSerializer(read_only=True)
     user = serializers.StringRelatedField(read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
@@ -82,7 +82,7 @@ class OrderShowSerializer(serializers.ModelSerializer):
             id = validated_data['shipping_address']
             da = DeliveryAddress.objects.get(id=id)
             instance.shipping_address = da
-            instance.price = instance.price + da.region.delivery_price
+            instance.price = instance.price + da.city.delivery_price
             instance.save()
 
         except:

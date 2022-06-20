@@ -5,9 +5,9 @@ from rest_framework.views import APIView
 from .filters import ProductFilter
 from account.models import DeliveryAddress
 from config.responses import ResponseSuccess, ResponseFail
-from .serializers import (TypeMedicineSerializer, MedicineSerializer, CartSerializer, OrderCreateSerializer,
+from .serializers import (CategorySerializer, ProductSerializer, CartSerializer, OrderCreateSerializer,
                           OrderShowSerializer, AdvertisingSerializer)
-from .models import PicturesMedicine, TypeProduct, Product, CartModel, OrderModel, Advertising
+from .models import Pictures, Category, Product, CartModel, OrderModel, Advertising
 from paymeuz.models import Card
 
 
@@ -20,47 +20,47 @@ class AdvertisingView(APIView):
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class TypeMedicineView(APIView):
+class CategoryView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        types = TypeProduct.objects.all()
-        serializer = TypeMedicineSerializer(types, many=True)
+        types = Category.objects.all()
+        serializer = CategorySerializer(types, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class MedicinesView(APIView):
+class ProductView(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         products = Product.objects.all()
         q = ProductFilter(request.GET, queryset=products).qs
-        serializer = MedicineSerializer(q, many=True)
+        serializer = ProductSerializer(q, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
         key = request.data['key']
         medicine = Product.objects.filter(name__contains=key)
-        serializer = MedicineSerializer(medicine, many=True)
+        serializer = ProductSerializer(medicine, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class GetMedicinesWithType(APIView):
+class GetProductsWithType(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         id_list = list(request.data['list'].split(','))
         medicine = Product.objects.filter(type_medicine_id__in=id_list)
-        serializer = MedicineSerializer(medicine, many=True)
+        serializer = ProductSerializer(medicine, many=True)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
-class GetSingleMedicine(APIView):
+class GetSingleProduct(APIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk):
         medicine = Product.objects.get(id=pk)
-        serializer = MedicineSerializer(medicine)
+        serializer = ProductSerializer(medicine)
         return ResponseSuccess(data=serializer.data, request=request.method)
 
 
@@ -148,22 +148,22 @@ class OrderView(APIView):
         if serializer.is_valid():
             if add_key == 1:
                 if order.shipping_address is None:
-                    if da.region.delivery_price == 0:
+                    if da.city.delivery_price == 0:
                         order.price = order.price + settings.DEFAULT_DELIVERY_COST
                     else:
-                        order.price = order.price + da.region.delivery_price
+                        order.price = order.price + da.city.delivery_price
                 else:
-                    old_price = order.shipping_address.region.delivery_price
+                    old_price = order.shipping_address.city.delivery_price
                     print(old_price)
                     if old_price == 0:
                         order.price = order.price - settings.DEFAULT_DELIVERY_COST
                         print('1')
                     else:
                         order.price = order.price - old_price
-                    if da.region.delivery_price == 0:
+                    if da.city.delivery_price == 0:
                         order.price = order.price + settings.DEFAULT_DELIVERY_COST
                     else:
-                        order.price = order.price + da.region.delivery_price
+                        order.price = order.price + da.city.delivery_price
             order.save()
             serializer.save()
             serializer = OrderShowSerializer(order)

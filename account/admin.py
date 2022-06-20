@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserModel, CountyModel, RegionModel, DeliveryAddress
+from .models import UserModel, CityModel, RegionModel, DeliveryAddress
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -39,5 +39,5 @@ admin.site.register(UserModel, CustomUserAdmin)
 # admin.site.register(RegionModel, RegionAdmin)
 admin.site.register(DeliveryAddress)
 admin.site.register(RegionModel)
-admin.site.register(CountyModel)
+admin.site.register(CityModel)
 
