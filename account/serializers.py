@@ -15,13 +15,14 @@ class ConfirmSmsSerializer(serializers.Serializer):
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['username', 'first_name', 'last_name', 'password', 'avatar']
+        fields = ['first_name', 'last_name', 'password', 'avatar']
         extra_kwargs = {
             'password': {'write_only': True},
             'avatar': {'required': False},
         }
 
-    def create(self, validated_data):
+    def update(self, instance, validated_data):
+        print('laaaaaaaaaaaa')
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if password is not None:
