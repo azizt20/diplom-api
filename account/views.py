@@ -5,6 +5,7 @@ from config.helpers import send_sms_code, validate_sms_code
 from config.responses import ResponseFail, ResponseSuccess
 from .serializers import (SmsSerializer, ConfirmSmsSerializer, RegistrationSerializer,
                           RegionSerializer, CitySerializer, UserSerializer, DeliverAddressSerializer)
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 
 class SendSmsView(APIView):
@@ -30,22 +31,33 @@ class ConfirmSmsView(APIView):
         serializer = ConfirmSmsSerializer(data=request.data)
         if serializer.is_valid():
             if validate_sms_code(serializer.data['phone'], serializer.data['code']):
-                return ResponseSuccess(data="Telefon nomer tasdiqladi", request=request.method)
+                user = UserModel.objects.create(username=serializer.data['phone'])
+                access_token = AccessToken().for_user(user)
+                refresh_token = RefreshToken().for_user(user)
+                return ResponseSuccess(data={
+                    "refresh": str(refresh_token),
+                    "access": str(access_token)
+                }, request=request.method)
             else:
                 return ResponseFail(data='Code hato kiritilgan', request=request.method)
         return ResponseFail(data=serializer.errors, request=request.method)
 
 
 class RegistrationView(APIView):
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         serializer = RegistrationSerializer()
         return ResponseSuccess(data=serializer.data, request=request.method)
 
     def post(self, request):
-        serializer = RegistrationSerializer(data=request.data)
+        print('adsasdasd')
+        serializer = RegistrationSerializer(instance=request.user, data=request.data, partial=True)
+        print('-----------------')
         if serializer.is_valid():
+            print('++++++++++++++++')
             serializer.save()
+            print('===========')
             return ResponseSuccess(data=serializer.data, request=request.method)
         else:
             return ResponseFail(data=serializer.errors, request=request.method)
