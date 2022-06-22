@@ -62,14 +62,13 @@ class DeliverAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DeliveryAddress
-        fields = ['id', 'name', 'region', 'full_address', 'apartment_office', 'floor', 'door_or_phone', 'instructions']
+        fields = ['id', 'name', 'city', 'full_address', 'postcode', 'door_or_phone', 'instructions']
         extra_kwargs = {
             'id': {'read_only': True},
             'name': {'required': False},
-            'region': {'required': False},
+            'city': {'required': False},
             'full_address': {'required': False},
-            'apartment_office': {'required': False},
-            'floor': {'required': False},
+            'postcode': {'required': False},
             'door_or_phone': {'required': False},
             'instructions': {'required': False},
         }

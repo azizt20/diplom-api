@@ -3,10 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from config.validators import PhoneValidator
 import datetime
-# from django.utils.translation import gettext as _
 
 today = datetime.date.today()
-
 
 class UserManager(BaseUserManager):
 

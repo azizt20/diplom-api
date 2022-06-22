@@ -1,10 +1,7 @@
 from django.db import models
 import datetime
-from django.urls import reverse_lazy
-# from django.utils.translation import gettext as _
 
 today = datetime.date.today()
-
 
 class Pictures(models.Model):
     image = models.ImageField(upload_to=f'pictures/{today.year}-{today.month}-{today.month}/',
